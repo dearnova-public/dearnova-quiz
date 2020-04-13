@@ -1,0 +1,68 @@
+version: '3.6'
+
+volumes:
+  postgres-dn-quiz-data:
+
+networks:
+  dn-quiz-docker:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.200.0.0/24
+
+services:
+  # Helper image to automatically reload containers with new image for rapid development
+  watchtower:
+    image: v2tec/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 10 --no-pull
+    networks:
+      - dn-quiz-docker
+
+  ingress:
+    image: nginx:${INGRESS_NGINX_VERSION}
+    ports:
+      - 80:80
+    volumes:
+      # The dir for main nginx config files
+      - ./data/ingress/conf.d/local:/etc/nginx/conf.d:ro
+      # The dir for shared nginx config files
+      - ./data/ingress/conf.d/shared:/etc/nginx/shared:ro
+      # The dir for static files of plug-ins
+      - ./data/ingress/html:/usr/share/nginx/html:ro
+    networks:
+      - dn-quiz-docker
+
+  database:
+    image: postgres:12-alpine
+    ports:
+      - 9000:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    volumes:
+      - postgres-dn-quiz-data:/var/lib/postgresql/data
+      - ./data/db/sql:/docker-entrypoint-initdb.d:ro
+    networks:
+      - dn-quiz-docker
+
+  quiz-service:
+    image: dearnova/dn-quiz-service:${DN_QUIZ_SERVICE}
+    restart: ${DOCKER_DEFAULT_RESTART_POLICY}
+    ports:
+      - 9001:8080
+    networks:
+      - dn-quiz-docker
+
+  quiz-client:
+    image: dearnova/dn-quiz-client:${DN_QUIZ_CLIENT}
+    restart: ${DOCKER_DEFAULT_RESTART_POLICY}
+    ports:
+      - 9002:80
+    networks:
+      - dn-quiz-docker

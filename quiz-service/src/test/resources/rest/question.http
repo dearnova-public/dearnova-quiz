@@ -1,0 +1,5 @@
+### Retrieve all Questions
+GET http://localhost:9001/api/question
+Content-Type: application/json
+
+###

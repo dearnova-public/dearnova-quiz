@@ -1,0 +1,17 @@
+server.port: 8080
+
+info.build:
+    name: '@project.name@'
+    version: '@project.version@'
+
+spring:
+    application.name: quiz-service
+    jpa.hibernate.ddl-auto: validate
+    datasource:
+        platform: postgres
+        name: quiz
+        currentSchema: quiz
+        url: jdbc:postgresql://database:5432/dnquiz?currentSchema=${spring.datasource.currentSchema}
+        username: quizadmin
+        password: quizadmin
+    output.ansi.enabled: always

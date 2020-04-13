@@ -1,0 +1,4 @@
+server.port: 9001
+
+spring.datasource:
+    url: jdbc:postgresql://localhost:9000/dnquiz?currentSchema=${spring.datasource.currentSchema}
