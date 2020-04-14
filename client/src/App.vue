@@ -4,6 +4,7 @@
             <div class="header">
                 <img class="logo" alt="DN logo" src="./assets/DN_logo_blue.svg">
                 <h1>Welcome to the DearNova Quiz!</h1>
+                <p>De quiz over vaak gehoorde uitdrukkingen binnen DearNova.</p>
             </div>
 
             <Quiz/>
